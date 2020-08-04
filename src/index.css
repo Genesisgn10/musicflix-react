@@ -23,6 +23,27 @@ a {
   color: inherit;
 }
 
+.h1 {
+  display: flex;
+  justify-content: center;
+}
+
+.link {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  margin-top: -10px;
+}
+
+.list {
+  margin-bottom: 25px;
+}
+
+.button {
+  background-color: black;
+  margin-bottom: 50px;
+}
+
 #root {
   min-height: calc(100vh - var(--bodyPaddingTop));
   display: flex;

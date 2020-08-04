@@ -38,10 +38,13 @@ function CadastroCategoria() {
 
   return (
     <PageDefault>
-      <h1>
-        Cadastro de Categoria:&nbsp;
-        {values.titulo}
+      <h1 className="h1">
+        Cadastro de Categoria
       </h1>
+
+      <Link to="/" className="link">
+        Ir para Home
+      </Link>
 
       <form onSubmit={function handleSubmit(params) {
         params.preventDefault();
@@ -89,11 +92,9 @@ function CadastroCategoria() {
           onChange={handleChange}
         />
 
-        <Button>
-          Cadastrar
-        </Button>
+        <h2>Categorias cadastradas</h2>
 
-        <ul>
+        <ul className="list">
           {categorias.map((categoria) => (
             <li key={`${categoria.titulo}`}>
               {categoria.titulo}
@@ -101,11 +102,12 @@ function CadastroCategoria() {
           ))}
         </ul>
 
-      </form>
-      <Link to="/">
-        Ir para Home
-      </Link>
+        <Button className="button">
+          Cadastrar
+        </Button>
 
+      </form>
+  
     </PageDefault>
   );
 }

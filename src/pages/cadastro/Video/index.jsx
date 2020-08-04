@@ -28,7 +28,11 @@ function CadastroVideo() {
 
   return (
     <PageDefault>
-      <h1>Cadastro de vídeo</h1>
+      <h1 className="h1">Cadastro de vídeo</h1>
+
+      <Link to="/cadastro/categoria" className="link">
+        Cadastrar Categoria
+      </Link>
 
       <form onSubmit={(e) => {
         e.preventDefault();
@@ -70,15 +74,12 @@ function CadastroVideo() {
           suggestions={categoryTittles}
         />
 
-        <Button type="submit">
+        <Button type="submit" className="button">
           Cadastrar
         </Button>
 
       </form>
 
-      <Link to="/cadastro/categoria">
-        Cadastrar Categoria
-      </Link>
     </PageDefault>
 
   );
