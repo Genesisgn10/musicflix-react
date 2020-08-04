@@ -4,88 +4,72 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import PageDefault from '../../../components/PageDefault';
 import FormField from '../../../components/FormField';
 import Button from '../../../components/Button';
+import useForm from '../../../hooks/useForm';
+import categoriasRepository from '../../../repositories/categoria';
 
 function CadastroCategoria() {
-  const valoresIniciais = {
-    nome: '',
+  const history = useHistory();
+  const initialValues = {
+    titulo: '',
     descricao: '',
     cor: '',
   };
+  const { handleChange, values, clearForm } = useForm(initialValues);
   const [categorias, setCategorias] = useState([]);
-  const [values, setValues] = useState(valoresIniciais);
-
-  function setValue(chave, valor) {
-    // chave: nome, descricao, bla, bli
-    setValues({
-      ...values,
-      [chave]: valor, // nome: 'valor'
-    });
-  }
-
-  function handleChange(infosDoEvento) {
-    setValue(
-      infosDoEvento.target.getAttribute('name'),
-      infosDoEvento.target.value,
-    );
-  }
 
   useEffect(() => {
-    const URL_TOP = 'http://localhost:8080/categorias';
-    fetch(URL_TOP)
-      .then(async (respostaDoServidor) => {
-        const resposta = await respostaDoServidor.json();
-        setCategorias([
-          ...resposta,
-        ]);
+    const URL = window.location.hostname.includes('localhost')
+      ? 'http://localhost:8080/categorias'
+      : 'https://aluraflix.herokuapp.com/categorias';
+    fetch(URL)
+      .then(async (response) => {
+        if (response.ok) {
+          const result = await response.json();
+          setCategorias(result);
+          return;
+        }
+        throw new Error('Não foi possível pegar os dados');
       });
   }, []);
-
-  //   setTimeout(() => {
-  //     setCategorias([
-  //       ...categorias,
-  //       {
-  //         id: 1,
-  //         nome: 'Front End',
-  //         descricao: 'Uma categoria show',
-  //         cor: '#cbd1ff',
-  //       },
-  //       {
-  //         id: 2,
-  //         nome: 'Back End',
-  //         descricao: 'Uma categoria show',
-  //         cor: '#cbd1ff',
-  //       },
-  //     ]);
-  //   }, 4 * 1000);
-  // }, []);
 
   return (
     <PageDefault>
       <h1>
-        Cadastro de Categoria:
-        {values.nome}
+        Cadastro de Categoria:&nbsp;
+        {values.titulo}
       </h1>
 
-      <form onSubmit={function handleSubmit(infosDoEvento) {
-        infosDoEvento.preventDefault();
+      <form onSubmit={function handleSubmit(params) {
+        params.preventDefault();
         setCategorias([
           ...categorias,
           values,
         ]);
 
-        setValues(valoresIniciais);
+        categoriasRepository.create({
+          titulo: values.titulo,
+          descricao: values.url,
+          cor: values.cor,
+        })
+          .then(() => {
+            // eslint-disable-next-line no-alert
+            window.alert('Cadastrado com sucesso!');
+            history.push('/');
+          });
+
+        clearForm();
       }}
       >
 
         <FormField
-          label="Nome da Categoria"
+          label="Nome"
           type="text"
-          name="nome"
-          value={values.nome}
+          name="titulo"
+          value={values.titulo}
           onChange={handleChange}
         />
 
@@ -108,25 +92,20 @@ function CadastroCategoria() {
         <Button>
           Cadastrar
         </Button>
+
+        <ul>
+          {categorias.map((categoria) => (
+            <li key={`${categoria.titulo}`}>
+              {categoria.titulo}
+            </li>
+          ))}
+        </ul>
+
       </form>
-
-      {categorias.length === 0 && (
-        <div>
-          Caregando...
-        </div>
-      )}
-
-      <ul>
-        {categorias.map((categoria) => (
-          <li key={`${categoria.nome}`}>
-            {categoria.nome}
-          </li>
-        ))}
-      </ul>
-
       <Link to="/">
-        Ir para home
+        Ir para Home
       </Link>
+
     </PageDefault>
   );
 }

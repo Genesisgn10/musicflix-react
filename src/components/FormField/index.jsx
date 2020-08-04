@@ -1,15 +1,9 @@
 /* eslint-disable linebreak-style */
-/* eslint-disable no-undef */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-trailing-spaces */
-// eslint-disable-next-line linebreak-style
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 import React from 'react';
 import PropTypes from 'prop-types';
-import Styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-const FormFieldWrapper = Styled.div`
+const FormFieldWrapper = styled.div`
   position: relative;
   textarea {
     min-height: 150px;
@@ -19,9 +13,9 @@ const FormFieldWrapper = Styled.div`
   }
 `;
 
-const Label = Styled.label``;
+const Label = styled.label``;
 
-Label.Text = Styled.span`
+Label.Text = styled.span`
   color: #E5E5E5;
   height: 57px;
   position: absolute; 
@@ -37,11 +31,10 @@ Label.Text = Styled.span`
   font-weight: 300;
   
   transition: .1s ease-in-out;
-
 `;
 
-const Input = Styled.input`
-background: #53585D;
+const Input = styled.input`
+  background: #53585D;
   color: #F5F5F5;
   display: block;
   width: 100%;
@@ -63,42 +56,58 @@ background: #53585D;
   &:focus {
     border-bottom-color: var(--primary);
   }
-  &:focus:not([type='color']) + span {
+  &:focus:not([type='color']) + ${Label.Text} {
     transform: scale(.6) translateY(-10px);
   }
-
-  ${({ hasValue }) => hasValue && css`
-      &:not([type='color']) + span {
-      transform: scale(.6) translateY(-10px);
-    }
-  `}
+  ${({ value }) => {
+    const hasValue = value.length > 0;
+    return hasValue && css`
+        &:not([type='color']) + ${Label.Text} {
+          transform: scale(.6) translateY(-10px);
+        }
+      `;
+  }
+}
 `;
+
 function FormField({
-  label, type, name, value, onChange,
+  label, name, type, value, onChange, suggestions,
 }) {
   const fieldId = `id_${name}`;
-  const isTextArea = type === 'textarea';
-  const tag = isTextArea ? 'textarea' : 'input';
-
-  const hasValue = value.length;
+  const tag = type === 'textarea' ? 'textarea' : 'input';
+  const hasValue = Boolean(value.length);
+  const hasSuggestions = Boolean(suggestions.length);
 
   return (
     <FormFieldWrapper>
       <Label htmlFor={fieldId}>
         <Input
           as={tag}
-          id={fieldId}
           type={type}
-          value={value}
           name={name}
           hasValue={hasValue}
+          value={value}
           onChange={onChange}
+          autoComplete={hasSuggestions ? 'off' : 'on'}
+          list={hasSuggestions ? `suggestionFor_${fieldId}` : undefined}
         />
         <Label.Text>
-
           {label}
           :
         </Label.Text>
+        {
+          hasSuggestions && (
+            <datalist id={`suggestionFor_${fieldId}`}>
+              {
+                suggestions.map((suggestion) => (
+                  <option value={suggestion} key={`suggestionFor_${fieldId}_option${suggestion}`}>
+                    {suggestion}
+                  </option>
+                ))
+              }
+            </datalist>
+          )
+        }
       </Label>
     </FormFieldWrapper>
   );
@@ -108,6 +117,7 @@ FormField.defaultProps = {
   type: 'text',
   value: '',
   onChange: () => { },
+  suggestions: [],
 };
 
 FormField.propTypes = {
@@ -116,6 +126,7 @@ FormField.propTypes = {
   name: PropTypes.string.isRequired,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  suggestions: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default FormField;
